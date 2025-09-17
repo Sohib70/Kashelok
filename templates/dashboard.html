@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+  <h2>💰 Moliyaviy boshqaruv</h2>
+
+  <!-- Sana oralig‘i tanlash -->
+  <form id="dateFilterForm" class="d-flex gap-2 my-3">
+    <input type="date" name="start_date" id="start_date" class="form-control" required>
+    <input type="date" name="end_date" id="end_date" class="form-control" required>
+    <button type="submit" class="btn btn-primary">📊 Grafikni yangilash</button>
+  </form>
+
+  <!-- Diagramma -->
+  <div class="card p-3 shadow-sm">
+    <canvas id="financeChart" height="120"></canvas>
+  </div>
+
+  <script>
+    async function loadChartData(startDate=null, endDate=null) {
+      let url = "{% url 'chart_data' %}";
+      if (startDate && endDate) {
+        url += `?start_date=${startDate}&end_date=${endDate}`;
+      }
+      const response = await fetch(url);
+      const data = await response.json();
+
+      financeChart.data.labels = data.labels;
+      financeChart.data.datasets[0].data = data.income_data;
+      financeChart.data.datasets[1].data = data.expense_data;
+      financeChart.update();
+    }
+
+    const ctx = document.getElementById("financeChart").getContext("2d");
+    const financeChart = new Chart(ctx, {
+      type: "line",
+      data: { labels: [], datasets: [
+        { label: "Kirim", borderColor: "green", backgroundColor: "rgba(0,128,0,0.2)", data: [], fill: true },
+        { label: "Chiqim", borderColor: "red", backgroundColor: "rgba(255,0,0,0.2)", data: [], fill: true }
+      ] },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "top" },
+          title: { display: true, text: "📊 Kirim / Chiqim diagrammasi" }
+        }
+      }
+    });
+
+    document.getElementById("dateFilterForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const startDate = document.getElementById("start_date").value;
+      const endDate = document.getElementById("end_date").value;
+      loadChartData(startDate, endDate);
+    });
+
+    loadChartData();
+  </script>
+{% endblock %}

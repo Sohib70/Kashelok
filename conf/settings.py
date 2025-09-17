@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'home',
     'users',
+    'finance',
     'widget_tweaks',
     "crispy_forms",
     "crispy_bootstrap5",
