@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Shaxsiy Koshelok</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .sidebar {
+            width: 280px;
+            height: 100vh;
+            border-right: 1px solid #ddd;
+            padding: 20px;
+        }
+        .profile-pic {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #555;
+        }
+        .username {
+            font-weight: bold;
+            margin-left: 10px;
+            font-size: 18px;
+        }
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="d-flex align-items-center mb-3">
+                <img src="https://via.placeholder.com/60" alt="Profil rasmi" class="profile-pic">
+                <span class="username">Username</span>
+            </div>
+            <div class="d-grid gap-2">
+                <button class="btn btn-success">Kirim</button>
+                <button class="btn btn-danger">Chiqim</button>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            {% block content %}
+            <h3>Asosiy qism</h3>
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{% if user.is_authenticated %}
+  <p>Xush kelibsiz, {{ user.username }}!</p>
+  <a href="{% url 'logout' %}">Chiqish</a>
+{% else %}
+  <a href="{% url 'login' %}">Kirish</a>
+{% endif %}
