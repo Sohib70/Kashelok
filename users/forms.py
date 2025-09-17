@@ -38,15 +38,26 @@ class ChangePassForm(forms.Form):
     code = forms.CharField(label="Tasdiqlash kodi", max_length=6)
 
 
-class ResetPassForm(forms.Form):
-    password = forms.CharField(label="Yangi parol", widget=forms.PasswordInput)
-    password_confirm = forms.CharField(label="Parolni tasdiqlang", widget=forms.PasswordInput)
-    code = forms.CharField(label="Tasdiqlash kodi", max_length=6)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        p1 = cleaned_data.get("password")
-        p2 = cleaned_data.get("password_confirm")
-        if p1 and p2 and p1 != p2:
-            raise forms.ValidationError("Parollar mos emas")
-        return cleaned_data
+class ResetPassForm(forms.Form):
+    password = forms.CharField(
+        label="Yangi parol",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Yangi parolingizni kiriting"
+        })
+    )
+    password_confirm = forms.CharField(
+        label="Parolni tasdiqlang",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Parolni qayta kiriting"
+        })
+    )
+    code = forms.CharField(
+        label="Tasdiqlash kodi",
+        widget=forms.TextInput(attrs={
+            "class": "form-control",
+            "placeholder": "SMS kodni kiriting"
+        })
+    )

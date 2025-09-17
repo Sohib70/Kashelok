@@ -8,6 +8,18 @@ from .forms import ChangePassForm, ResetPassForm
 from .utils import generate_code, send_to_mail
 from .models import CustomUser
 
+def signup_view(request):
+    if request.method == "POST":
+        form = SignUpForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "✅ Ro‘yxatdan o‘tish muvaffaqiyatli! Endi login qiling.")
+            return redirect("login")
+        else:
+            messages.error(request, "❌ Ma’lumotlar noto‘g‘ri. Qayta tekshiring.")
+    else:
+        form = SignUpForm()
+    return render(request, "accound/signup.html", {"form": form})
 
 
 
@@ -17,7 +29,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect("home")
+            return redirect("index")
     else:
         form = LoginForm()
     return render(request, "accound/login.html", {"form": form})
@@ -67,6 +79,7 @@ def change_password(request):
     return render(request, "change_password.html", {"form": form})
 
 
+
 def reset_password(request):
     if request.method == "POST":
         form = ResetPassForm(request.POST)
@@ -84,6 +97,8 @@ def reset_password(request):
                 user.set_password(password)
                 user.save()
                 messages.success(request, "Parol tiklandi, endi login qiling!")
+                request.session.pop("reset_code", None)
+                request.session.pop("reset_email", None)
                 return redirect("login")
             except CustomUser.DoesNotExist:
                 messages.error(request, "Bunday foydalanuvchi topilmadi!")
@@ -97,4 +112,4 @@ def reset_password(request):
             request.session["reset_email"] = email
             send_to_mail(email, code)
 
-    return render(request, "reset_password.html", {"form": form})
+    return render(request, "accound/reset_password.html", {"form": form})

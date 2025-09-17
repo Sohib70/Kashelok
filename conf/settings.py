@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'home',
     'users',
     'widget_tweaks',
+    "crispy_forms",
+    "crispy_bootstrap5",
 ]
 
 MIDDLEWARE = [
@@ -134,3 +136,13 @@ AUTHENTICATION_BACKENDS = [
     'users.send_code.EmailOrPhoneBackend',
 ]
 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'xolburiyev@gmail.com'
+EMAIL_HOST_PASSWORD = 'c b q v q w a e n z d h g z g c'
+EMAIL_USE_SSL = False
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
