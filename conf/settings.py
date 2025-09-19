@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     "crispy_forms",
     "crispy_bootstrap5",
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "finance.context_processors.user_balance",
             ],
         },
     },
@@ -136,6 +138,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'users.send_code.EmailOrPhoneBackend',
 ]
+USE_L10N = True
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 

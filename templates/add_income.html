@@ -1,7 +1,27 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
 <h2>Kirim qo‘shish</h2>
+
 <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Qo‘shish</button>
+    <div class="mb-3">
+        {{ form.amount.label_tag }}
+        {{ form.amount }}
+    </div>
+    <div class="mb-3">
+        {{ form.comment.label_tag }}
+        {{ form.comment }}
+    </div>
+    <div class="mb-3">
+        {{ form.date.label_tag }}
+        {{ form.date }}
+    </div>
+    <div class="mb-3">
+        {{ form.payment_method.label_tag }}
+        {{ form.payment_method }}
+    </div>
+    <button type="submit" class="btn btn-success">Saqlash</button>
 </form>
-<a href="{% url 'dashboard' %}">Dashboardga qaytish</a>
+
+{% endblock %}

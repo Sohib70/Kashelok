@@ -87,11 +87,11 @@ def reset_password(request):
 
             if code != request.session["reset_code"]:
                 messages.error(request, "Kod xato kiritildi")
-                return render(request, "reset_password.html", {"form": form})
+                return render(request, "accound/reset_password.html", {"form": form})
 
             if new_pass != confirm_pass:
                 messages.error(request, "Parollar mos kelmadi")
-                return render(request, "reset_password.html", {"form": form})
+                return render(request, "accound/reset_password.html", {"form": form})
 
             # Hamma narsa to'g'ri bo'lsa parolni o'zgartirish
             user_id = request.session["reset_user"]

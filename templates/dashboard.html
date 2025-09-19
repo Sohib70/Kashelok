@@ -1,69 +1,125 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+{% load humanize %}
 {% block content %}
-<h3>Dashboard</h3>
+<h2>Dashboard</h2>
 
-<div class="mb-3 d-flex gap-3">
-    <div class="p-3 border rounded">
-        <h5>Umumiy Kirim: <span class="text-success">{{ kirim_sum }}</span></h5>
+<!-- Period va oraliq sana -->
+<form method="get" class="mb-3 d-flex gap-2 align-items-center">
+    <label>Davrni tanlang:</label>
+    <select name="period" class="form-select w-auto">
+        <option value="kunlik" {% if period == 'kunlik' %}selected{% endif %}>Kunlik</option>
+        <option value="haftalik" {% if period == 'haftalik' %}selected{% endif %}>Haftalik</option>
+        <option value="oylik" {% if period == 'oylik' %}selected{% endif %}>Oylik</option>
+        <option value="oraliq" {% if period == 'oraliq' %}selected{% endif %}>Oraliq</option>
+    </select>
+
+    <label>dan:</label>
+    <input type="date" name="start_date" value="{{ start_date }}" class="form-control w-auto">
+    <label>gacha:</label>
+    <input type="date" name="end_date" value="{{ end_date }}" class="form-control w-auto">
+
+    <button type="submit" class="btn btn-primary btn-sm">Ko‘rsatish</button>
+</form>
+
+<!-- Kirim / Chiqim / Balans -->
+<div class="row mb-4 text-center">
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h5 class="text-success">Kirim</h5>
+            <p class="fs-4 fw-bold text-success">{{ kirim_sum|intcomma }} so‘m</p>
+        </div>
     </div>
-    <div class="p-3 border rounded">
-        <h5>Umumiy Chiqim: <span class="text-danger">{{ chiqim_sum }}</span></h5>
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h5 class="text-danger">Chiqim</h5>
+            <p class="fs-4 fw-bold text-danger">{{ chiqim_sum|intcomma }} so‘m</p>
+        </div>
     </div>
-    <div class="p-3 border rounded">
-        <h5>Balans: <span>{{ balance }}</span></h5>
+    <div class="col-md-4">
+        <div class="card shadow-sm p-3">
+            <h5 class="text-primary">Umumiy balans</h5>
+            <p class="fs-4 fw-bold">{{ balance|intcomma }} so‘m</p>
+        </div>
     </div>
 </div>
 
-<h4>Kirimlar bo‘yicha kategoriyalar</h4>
-<div class="row">
+<!-- Pie chart -->
+<div class="row justify-content-center mb-4">
+    <div class="col-md-5">
+        <canvas id="myPieChart" width="300" height="300"></canvas>
+    </div>
+</div>
+
+<!-- Daromad kategoriyalari -->
+<h4>Daromad kategoriyalari:</h4>
+<div class="row mb-4">
     {% for cat in income_categories %}
-    <div class="col-md-3 text-center mb-3">
-        <div class="card p-2">
-            {% if cat.icon %}
-            <img src="{{ cat.icon.url }}" width="50" class="mb-2"><br>
-            {% endif %}
-            <strong>{{ cat.name }}</strong><br>
-            <span class="text-success">{{ cat.sum }}</span>
-            <br>
-            <a href="{% url 'category_detail' pk=cat.id %}" class="btn btn-sm btn-primary mt-1">Ko‘rish</a>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card p-2 text-center shadow-sm small-card">
+                {% if cat.icon %}
+                <img src="{{ cat.icon.url }}" width="160" class="mb-1"><br>
+                {% endif %}
+                <strong>{{ cat.name }}</strong>
+                <p class="text-success mb-0">{{ cat.sum|intcomma }}</p>
+            </div>
         </div>
-    </div>
     {% endfor %}
 </div>
 
-<h4>Chiqimlar bo‘yicha kategoriyalar</h4>
-<div class="row">
+<!-- Chiqim kategoriyalari -->
+<h4>Xarajat kategoriyalari:</h4>
+<div class="row mb-4">
     {% for cat in expense_categories %}
-    <div class="col-md-3 text-center mb-3">
-        <div class="card p-2">
-            {% if cat.icon %}
-            <img src="{{ cat.icon.url }}" width="50" class="mb-2"><br>
-            {% endif %}
-            <strong>{{ cat.name }}</strong><br>
-            <span class="text-danger">{{ cat.sum }}</span>
-            <br>
-            <a href="{% url 'expense_category_detail' pk_e=cat.id %}" class="btn btn-sm btn-danger mt-1">Ko‘rish</a>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card p-2 text-center shadow-sm small-card">
+                {% if cat.icon %}
+                <img src="{{ cat.icon.url }}" width="160" class="mb-1"><br>
+                {% endif %}
+                <strong>{{ cat.name }}</strong>
+                <p class="text-danger mb-0">{{ cat.sum|intcomma }}</p>
+            </div>
         </div>
-    </div>
     {% endfor %}
 </div>
 
-<!-- Chiqim diagrammasi -->
-<canvas id="expenseChart" width="400" height="200"></canvas>
+<style>
+.small-card { font-size: 0.9rem; padding: 0.5rem !important; }
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 <script>
-const ctx = document.getElementById('expenseChart');
-const expenseChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-        labels: [{% for cat in expense_categories %}'{{ cat.name }}',{% endfor %}],
-        datasets: [{
-            label: 'Chiqimlar',
-            data: [{% for cat in expense_categories %}{{ cat.sum }},{% endfor %}],
-            borderWidth: 1
-        }]
+// Pie chart
+const ctx = document.getElementById('myPieChart').getContext('2d');
+const data = {
+    labels: ['Daromad', 'Xarajat'],
+    datasets: [{
+        data: [{{ kirim_sum }}, {{ chiqim_sum }}],
+        backgroundColor: ['#4caf50', '#f44336'],
+        borderWidth: 1
+    }]
+};
+const options = {
+    responsive: true,
+    plugins: {
+        legend: { position: 'bottom' },
+        tooltip: { enabled: true },
+        datalabels: {
+            color: '#fff',
+            formatter: (value, ctx) => {
+                let sum = ctx.chart.data.datasets[0].data.reduce((a,b) => a+b, 0);
+                let percentage = (value*100 / sum).toFixed(1)+"%";
+                return percentage;
+            }
+        }
     }
+};
+new Chart(ctx, {
+    type: 'pie',
+    data: data,
+    options: options,
+    plugins: [ChartDataLabels]
 });
 </script>
+
 {% endblock %}

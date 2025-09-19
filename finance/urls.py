@@ -23,5 +23,7 @@ urlpatterns = [
 
     path('expense/<int:pk>/edit/', views.update_expense, name='update_expense'),
     path('expense/<int:pk>/delete/', views.delete_expense, name='delete_expense'),
+
+    path("update-balance/", views.update_balance, name="update_balance"),
 ]
 

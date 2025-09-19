@@ -2,49 +2,103 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from django.contrib import messages
-from .models import Income, Expense, Category, ExpenseCategory
+from .models import Income, Expense, Category, ExpenseCategory, UserBalance
 from .forms import IncomeForm, CategoryForm, ExpenseCategoryForm, ExpenseForm
+from datetime import datetime, timedelta
+from decimal import Decimal
 
-# ---------------- Dashboard ----------------
 @login_required
 def dashboard(request):
     user = request.user
+    balance_obj, created = UserBalance.objects.get_or_create(user=user)
 
-    # Kirimlar
-    kirimlar = Income.objects.filter(user=user)
+    dollar_to_sum = 12300
+
+    # 🔹 Balansni yangilash (POST dan kelganda)
+    if request.method == "POST":
+        cash = request.POST.get("cash")
+        card = request.POST.get("card")
+        dollar = request.POST.get("dollar")
+
+        balance_obj.cash = cash or 0
+        balance_obj.card = card or 0
+        balance_obj.dollar = dollar or 0
+        balance_obj.save()
+
+        return redirect("dashboard")  # refresh qilib yangisini ko‘rsatish uchun
+
+    # 🔹 Filterlar
+    period = request.GET.get('period', 'kunlik')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    today = datetime.today().date()
+    if not start_date:
+        start_date = today
+    else:
+        start_date = datetime.fromisoformat(start_date).date()
+    if not end_date:
+        end_date = start_date
+    else:
+        end_date = datetime.fromisoformat(end_date).date()
+
+    if period == 'kunlik':
+        start_date = end_date = start_date
+    elif period == 'haftalik':
+        start_date = end_date - timedelta(days=6)
+    elif period == 'oylik':
+        start_date = end_date.replace(day=1)
+
+    # 🔹 Kirim/chiqimlar
+    kirimlar = Income.objects.filter(user=user, date__range=[start_date, end_date])
+    chiqimlar = Expense.objects.filter(user=user, date__range=[start_date, end_date])
+
     kirim_sum = kirimlar.aggregate(total=Sum('amount'))['total'] or 0
-    income_categories = Category.objects.all()
-    income_cat_list = []
-    for cat in income_categories:
-        cat_sum = kirimlar.filter(category=cat).aggregate(total=Sum('amount'))['total'] or 0
-        cat.icon = getattr(cat, 'image', '')
-        cat.sum = cat_sum
-        income_cat_list.append(cat)
-
-    # Chiqimlar
-    chiqimlar = Expense.objects.filter(user=user)
     chiqim_sum = chiqimlar.aggregate(total=Sum('amount'))['total'] or 0
-    expense_categories = ExpenseCategory.objects.all()
-    expense_cat_list = []
-    for cat in expense_categories:
-        cat_sum = chiqimlar.filter(category=cat).aggregate(total=Sum('amount'))['total'] or 0
-        cat.icon = getattr(cat, 'image', '')
-        cat.sum = cat_sum
-        expense_cat_list.append(cat)
-
     balance = kirim_sum - chiqim_sum
+
+    # 🔹 Kategoriyalar
+    income_categories = []
+    for cat in Category.objects.all():
+        total = kirimlar.filter(category=cat).aggregate(total=Sum('amount'))['total'] or 0
+        if total > 0:
+            cat.sum = total
+            cat.icon = getattr(cat, 'image', '')
+            income_categories.append(cat)
+
+    expense_categories = []
+    for cat in ExpenseCategory.objects.all():
+        total = chiqimlar.filter(category=cat).aggregate(total=Sum('amount'))['total'] or 0
+        if total > 0:
+            cat.sum = total
+            cat.icon = getattr(cat, 'image', '')
+            expense_categories.append(cat)
+
+    # 🔹 Umumiy balans (foydalanuvchi balanslari + kirim/chiqim)
+    total_balance = balance_obj.total_balance(dollar_to_sum=dollar_to_sum) + balance
 
     context = {
         'kirim_sum': kirim_sum,
         'chiqim_sum': chiqim_sum,
         'balance': balance,
-        'income_categories': income_cat_list,
-        'expense_categories': expense_cat_list,
+        'income_categories': income_categories,
+        'expense_categories': expense_categories,
+        'period': period,
+        'start_date': start_date,
+        'end_date': end_date,
+        'today': today,
+        'cash_amount': balance_obj.cash,
+        'card_amount': balance_obj.card,
+        'dollar_amount': balance_obj.dollar,
+        'dollar_to_sum': dollar_to_sum,
+        'total_balance': total_balance,
     }
     return render(request, 'dashboard.html', context)
 
 
-# ---------------- Category Views (Income) ----------------
+
+# ------------------- Category Views -------------------
+
 @login_required
 def category_list(request):
     categories = Category.objects.all()
@@ -92,7 +146,8 @@ def delete_category(request, pk):
     return render(request, "delete_category.html", {"category": category})
 
 
-# ---------------- ExpenseCategory Views ----------------
+# ------------------- Expense Category Views -------------------
+
 @login_required
 def expense_category_list(request):
     categories = ExpenseCategory.objects.all()
@@ -141,12 +196,14 @@ def delete_expense_category(request, pk_e):
     return render(request, "delete_expense_category.html", {"category": category})
 
 
-# ---------------- Income Views ----------------
+# ------------------- Income Views -------------------
+
 @login_required
 def add_income(request, pk=None):
     category = None
     if pk:
         category = get_object_or_404(Category, pk=pk)
+
     if request.method == "POST":
         form = IncomeForm(request.POST)
         if form.is_valid():
@@ -155,37 +212,82 @@ def add_income(request, pk=None):
             if category:
                 income.category = category
             income.save()
-            messages.success(request, "Kirim qo‘shildi")
+
+            balance_obj, created = UserBalance.objects.get_or_create(user=request.user)
+            if income.payment_method == 'cash':
+                balance_obj.cash += Decimal(income.amount)
+            elif income.payment_method == 'card':
+                balance_obj.card += Decimal(income.amount)
+            elif income.payment_method == 'dollar':
+                balance_obj.dollar += Decimal(income.amount)
+            balance_obj.save()
+
+            messages.success(request, "Kirim qo‘shildi va balans yangilandi")
             return redirect('category_detail', pk=income.category.id)
     else:
         form = IncomeForm(initial={"category": category})
     return render(request, "add_income.html", {"form": form, "category": category})
 
+
 @login_required
 def update_income(request, pk):
     income = get_object_or_404(Income, pk=pk, user=request.user)
     if request.method == "POST":
+        old_amount = income.amount
+        old_method = income.payment_method
         form = IncomeForm(request.POST, instance=income)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Kirim yangilandi")
+            income = form.save(commit=False)
+            income.user = request.user
+            income.save()
+
+            # Balansni tuzatish
+            balance_obj, created = UserBalance.objects.get_or_create(user=request.user)
+            # Oldingi summani olib tashlaymiz
+            if old_method == 'cash':
+                balance_obj.cash -= old_amount
+            elif old_method == 'card':
+                balance_obj.card -= old_amount
+            elif old_method == 'dollar':
+                balance_obj.dollar -= old_amount
+            # Yangi summani qo‘shamiz
+            if income.payment_method == 'cash':
+                balance_obj.cash += income.amount
+            elif income.payment_method == 'card':
+                balance_obj.card += income.amount
+            elif income.payment_method == 'dollar':
+                balance_obj.dollar += income.amount
+            balance_obj.save()
+
+            messages.success(request, "Kirim yangilandi va balans tuzatildi")
             return redirect('category_detail', pk=income.category.id)
     else:
         form = IncomeForm(instance=income)
     return render(request, "add_income.html", {"form": form, "category": income.category})
 
+
 @login_required
 def delete_income(request, pk):
     income = get_object_or_404(Income, pk=pk, user=request.user)
     if request.method == "POST":
+        balance_obj, created = UserBalance.objects.get_or_create(user=request.user)
+        # Balansni kamaytirish
+        if income.payment_method == 'cash':
+            balance_obj.cash -= income.amount
+        elif income.payment_method == 'card':
+            balance_obj.card -= income.amount
+        elif income.payment_method == 'dollar':
+            balance_obj.dollar -= income.amount
+        balance_obj.save()
+
         category_id = income.category.id
         income.delete()
-        messages.success(request, "Kirim o‘chirildi")
+        messages.success(request, "Kirim o‘chirildi va balans tuzatildi")
         return redirect('category_detail', pk=category_id)
     return render(request, "delete_income.html", {"income": income})
 
 
-# ---------------- Expense Views ----------------
+# ------------------- Expense Views -------------------
 @login_required
 def add_expense(request, pk_e=None):
     category = None
@@ -197,7 +299,6 @@ def add_expense(request, pk_e=None):
         if form.is_valid():
             expense = form.save(commit=False)
             expense.user = request.user
-
             if category:
                 expense.category = category
             elif not expense.category:
@@ -205,32 +306,103 @@ def add_expense(request, pk_e=None):
                 return redirect('expense_category_list')
 
             expense.save()
-            messages.success(request, "Chiqim qo‘shildi")
+
+            # Balansni yangilash payment_method bo'yicha
+            balance_obj, created = UserBalance.objects.get_or_create(user=request.user)
+
+            amount = Decimal(expense.amount)  # majburan Decimal qilamiz
+
+            if expense.payment_method == 'cash':
+                balance_obj.cash -= amount
+            elif expense.payment_method == 'card':
+                balance_obj.card -= amount
+            elif expense.payment_method == 'dollar':
+                balance_obj.dollar -= amount
+
+            balance_obj.save()
+
+            messages.success(request, "Chiqim qo‘shildi va balans yangilandi")
             return redirect('expense_category_detail', pk_e=expense.category.id)
     else:
         form = ExpenseForm(initial={"category": category})
 
     return render(request, "add_expense.html", {"form": form, "category": category})
 
+
 @login_required
 def update_expense(request, pk):
     expense = get_object_or_404(Expense, pk=pk, user=request.user)
     if request.method == "POST":
+        old_amount = expense.amount
+        old_method = expense.payment_method
         form = ExpenseForm(request.POST, instance=expense)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Chiqim yangilandi")
+            expense = form.save(commit=False)
+            expense.user = request.user
+            expense.save()
+
+            # Balansni tuzatish
+            balance_obj, created = UserBalance.objects.get_or_create(user=request.user)
+            # Oldingi summani olib tashlaymiz
+            if old_method == 'cash':
+                balance_obj.cash += old_amount
+            elif old_method == 'card':
+                balance_obj.card += old_amount
+            elif old_method == 'dollar':
+                balance_obj.dollar += old_amount
+            # Yangi summani kamaytiramiz
+            if expense.payment_method == 'cash':
+                balance_obj.cash -= expense.amount
+            elif expense.payment_method == 'card':
+                balance_obj.card -= expense.amount
+            elif expense.payment_method == 'dollar':
+                balance_obj.dollar -= expense.amount
+            balance_obj.save()
+
+            messages.success(request, "Chiqim yangilandi va balans tuzatildi")
             return redirect('expense_category_detail', pk_e=expense.category.id)
     else:
         form = ExpenseForm(instance=expense)
     return render(request, "add_expense.html", {"form": form, "category": expense.category})
 
+
 @login_required
 def delete_expense(request, pk):
     expense = get_object_or_404(Expense, pk=pk, user=request.user)
     if request.method == "POST":
+        balance_obj, created = UserBalance.objects.get_or_create(user=request.user)
+        # Balansni qayta tiklash
+        if expense.payment_method == 'cash':
+            balance_obj.cash += expense.amount
+        elif expense.payment_method == 'card':
+            balance_obj.card += expense.amount
+        elif expense.payment_method == 'dollar':
+            balance_obj.dollar += expense.amount
+        balance_obj.save()
+
         category_id = expense.category.id
         expense.delete()
-        messages.success(request, "Chiqim o‘chirildi")
+        messages.success(request, "Chiqim o‘chirildi va balans tuzatildi")
         return redirect('expense_category_detail', pk_e=category_id)
     return render(request, "delete_expense.html", {"expense": expense})
+
+
+@login_required
+def update_balance(request):
+    balance_obj, created = UserBalance.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        cash = request.POST.get("cash") or 0
+        card = request.POST.get("card") or 0
+        dollar = request.POST.get("dollar") or 0
+
+        # Eski qiymatga qo‘shmaymiz, to‘g‘ridan-to‘g‘ri yangisini yozamiz
+        balance_obj.cash = Decimal(cash)
+        balance_obj.card = Decimal(card)
+        balance_obj.dollar = Decimal(dollar)
+        balance_obj.save()
+
+        messages.success(request, "Balans yangilandi")
+        return redirect("dashboard")
+
+    return redirect("dashboard")
