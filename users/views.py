@@ -17,10 +17,10 @@ def signup_view(request):
         form = SignUpForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request, "✅ Ro‘yxatdan o‘tish muvaffaqiyatli! Endi login qiling.")
+            messages.success(request, "Royxatdan otish muvaffaqiyatli! Endi login qiling.")
             return redirect("login")
         else:
-            messages.error(request, "❌ Ma’lumotlar noto‘g‘ri. Qayta tekshiring.")
+            messages.error(request, "Malumotlar notogri. Qayta tekshiring.")
     else:
         form = SignUpForm()
     return render(request, "accound/signup.html", {"form": form})
@@ -93,13 +93,11 @@ def reset_password(request):
                 messages.error(request, "Parollar mos kelmadi")
                 return render(request, "accound/reset_password.html", {"form": form})
 
-            # Hamma narsa to'g'ri bo'lsa parolni o'zgartirish
             user_id = request.session["reset_user"]
             user = User.objects.get(id=user_id)
             user.set_password(new_pass)
             user.save()
 
-            # Session ma'lumotlarini tozalash
             del request.session["reset_code"]
             del request.session["reset_user"]
             del request.session["reset_code_time"]

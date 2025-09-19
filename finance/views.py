@@ -18,12 +18,10 @@ def dashboard(request):
         cash = request.POST.get("cash")
         card = request.POST.get("card")
         dollar = request.POST.get("dollar")
-
         balance_obj.cash = cash or 0
         balance_obj.card = card or 0
         balance_obj.dollar = dollar or 0
         balance_obj.save()
-
         return redirect("dashboard")
 
     period = request.GET.get('period', 'kunlik')
