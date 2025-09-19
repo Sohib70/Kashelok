@@ -3,6 +3,7 @@ from django.conf import settings
 from datetime import datetime
 
 class Category(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True)
     image = models.ImageField(
         upload_to="income_images/",
@@ -16,6 +17,7 @@ class Category(models.Model):
 
 
 class ExpenseCategory(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True)
     image = models.ImageField(
         upload_to="expense_images/",
