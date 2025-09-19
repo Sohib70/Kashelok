@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Chiqim qo‘shish</h2>
-<form method="post">
+
+<form method="post" action="{% url 'add_expense' pk_e=category.id %}">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="btn btn-primary">Saqlash</button>

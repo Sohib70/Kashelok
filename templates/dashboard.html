@@ -14,22 +14,41 @@
     </div>
 </div>
 
-<h4>Kategoriyalar bo‘yicha chiqimlar</h4>
+<h4>Kirimlar bo‘yicha kategoriyalar</h4>
 <div class="row">
-    {% for cat in categories %}
+    {% for cat in income_categories %}
     <div class="col-md-3 text-center mb-3">
         <div class="card p-2">
             {% if cat.icon %}
-            <img src="{{ cat.icon }}" width="50" class="mb-2"><br>
+            <img src="{{ cat.icon.url }}" width="50" class="mb-2"><br>
             {% endif %}
             <strong>{{ cat.name }}</strong><br>
-            <span class="text-danger">{{ cat.sum }}</span>
+            <span class="text-success">{{ cat.sum }}</span>
+            <br>
+            <a href="{% url 'category_detail' pk=cat.id %}" class="btn btn-sm btn-primary mt-1">Ko‘rish</a>
         </div>
     </div>
     {% endfor %}
 </div>
 
-<!-- Diagram -->
+<h4>Chiqimlar bo‘yicha kategoriyalar</h4>
+<div class="row">
+    {% for cat in expense_categories %}
+    <div class="col-md-3 text-center mb-3">
+        <div class="card p-2">
+            {% if cat.icon %}
+            <img src="{{ cat.icon.url }}" width="50" class="mb-2"><br>
+            {% endif %}
+            <strong>{{ cat.name }}</strong><br>
+            <span class="text-danger">{{ cat.sum }}</span>
+            <br>
+            <a href="{% url 'expense_category_detail' pk_e=cat.id %}" class="btn btn-sm btn-danger mt-1">Ko‘rish</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Chiqim diagrammasi -->
 <canvas id="expenseChart" width="400" height="200"></canvas>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -38,10 +57,10 @@ const ctx = document.getElementById('expenseChart');
 const expenseChart = new Chart(ctx, {
     type: 'pie',
     data: {
-        labels: [{% for cat in categories %}'{{ cat.name }}',{% endfor %}],
+        labels: [{% for cat in expense_categories %}'{{ cat.name }}',{% endfor %}],
         datasets: [{
             label: 'Chiqimlar',
-            data: [{% for cat in categories %}{{ cat.sum }},{% endfor %}],
+            data: [{% for cat in expense_categories %}{{ cat.sum }},{% endfor %}],
             borderWidth: 1
         }]
     }
