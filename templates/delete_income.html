@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Kirim o‘chirish</h2>
+<p>Haqiqatan ham {{ income.amount }} kirimini o‘chirmoqchimisiz?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Ha, o‘chirish</button>
+    <a href="{% url 'category_detail' income.category.id %}" class="btn btn-secondary">Bekor qilish</a>
+</form>
+{% endblock %}

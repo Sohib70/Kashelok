@@ -1,155 +1,235 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
-from datetime import date, timedelta
-from .forms import IncomeForm, ExpenseForm
-from .models import Income, Expense
-from django.http import JsonResponse
-from django.db.models import Sum
-from django.utils.dateparse import parse_date
+from .models import Income, Expense, Category,ExpenseCategory
+from .forms import IncomeForm,CategoryForm,ExpenseCategoryForm,ExpenseForm
+from django.contrib import messages
 
-def kirim_list(request):
-    return render(request, "finance/kirim_list.html")
-
-def chiqim_list(request):
-    return render(request, "finance/chiqim_list.html")
 
 @login_required
 def dashboard(request):
-    today = date.today()
-    start_week = today - timedelta(days=today.weekday())  # haftaning 1-kuni
-    start_month = today.replace(day=1)  # oyning 1-kuni
+    user = request.user
 
-    # umumiy hisob
-    total_income = Income.objects.filter(user=request.user).aggregate(Sum("amount"))["amount__sum"] or 0
-    total_expense = Expense.objects.filter(user=request.user).aggregate(Sum("amount"))["amount__sum"] or 0
-    balance = total_income - total_expense
+    kirimlar = Income.objects.filter(user=user)
+    kirim_sum = kirimlar.aggregate(total=Sum('amount'))['total'] or 0
 
-    # kunlik
-    daily_income = Income.objects.filter(user=request.user, date=today).aggregate(Sum("amount"))["amount__sum"] or 0
-    daily_expense = Expense.objects.filter(user=request.user, date=today).aggregate(Sum("amount"))["amount__sum"] or 0
+    chiqimlar = Expense.objects.filter(user=user)
+    chiqim_sum = chiqimlar.aggregate(total=Sum('amount'))['total'] or 0
 
-    # haftalik
-    weekly_income = Income.objects.filter(user=request.user, date__gte=start_week).aggregate(Sum("amount"))["amount__sum"] or 0
-    weekly_expense = Expense.objects.filter(user=request.user, date__gte=start_week).aggregate(Sum("amount"))["amount__sum"] or 0
+    balance = kirim_sum - chiqim_sum
 
-    # oylik
-    monthly_income = Income.objects.filter(user=request.user, date__gte=start_month).aggregate(Sum("amount"))["amount__sum"] or 0
-    monthly_expense = Expense.objects.filter(user=request.user, date__gte=start_month).aggregate(Sum("amount"))["amount__sum"] or 0
-
-    # sanalar oralig‘i bo‘yicha filter
-    start_date = request.GET.get("start_date")
-    end_date = request.GET.get("end_date")
-    filtered_income = filtered_expense = None
-
-    if start_date and end_date:
-        filtered_income = Income.objects.filter(user=request.user, date__range=[start_date, end_date])
-        filtered_expense = Expense.objects.filter(user=request.user, date__range=[start_date, end_date])
+    categories = Category.objects.all()
+    cat_list = []
+    for cat in categories:
+        cat_sum = chiqimlar.filter(category=cat).aggregate(total=Sum('amount'))['total'] or 0
+        cat.icon = getattr(cat, 'icon', '')
+        cat.sum = cat_sum
+        cat_list.append(cat)
 
     context = {
-        "total_income": total_income,
-        "total_expense": total_expense,
-        "balance": balance,
-        "daily_income": daily_income,
-        "daily_expense": daily_expense,
-        "weekly_income": weekly_income,
-        "weekly_expense": weekly_expense,
-        "monthly_income": monthly_income,
-        "monthly_expense": monthly_expense,
-        "filtered_income": filtered_income,
-        "filtered_expense": filtered_expense,
+        'kirim_sum': kirim_sum,
+        'chiqim_sum': chiqim_sum,
+        'balance': balance,
+        'categories': cat_list,
     }
-    return render(request, "dashboard.html", context)
+
+    return render(request, 'dashboard.html', context)
 
 
 @login_required
-def income_list(request):
-    incomes = Income.objects.filter(user=request.user).order_by("-date")
+def category_list(request):
+    categories = Category.objects.all()
+    for cat in categories:
+        cat.total_income = cat.income_set.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or 0
+    return render(request, "category_list.html", {"categories": categories})
+
+@login_required
+def category_detail(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    incomes = category.income_set.all()
+    return render(request, "category_detail.html", {
+        "category": category,
+        "incomes": incomes
+    })
+
+
+@login_required
+def add_category(request):
     if request.method == "POST":
-        form = IncomeForm(request.POST, request.FILES)
+        form = CategoryForm(request.POST,request.FILES)
         if form.is_valid():
-            income = form.save(commit=False)
-            income.user = request.user
-            income.save()
-            return redirect("income_list")
+            form.save()
+            return redirect("category_list")
     else:
-        form = IncomeForm()
-    return render(request, "finance/income_list.html", {"incomes": incomes, "form": form})
-
+        form = CategoryForm()
+    return render(request, "add_category.html", {"form": form})
 
 @login_required
-def expense_list(request):
-    expenses = Expense.objects.filter(user=request.user).order_by("-date")
+def update_category(request, pk):
+    category = get_object_or_404(Category, pk=pk)
     if request.method == "POST":
-        form = ExpenseForm(request.POST, request.FILES)
+        form = CategoryForm(request.POST, request.FILES, instance=category)
         if form.is_valid():
-            expense = form.save(commit=False)
-            expense.user = request.user
-            expense.save()
-            return redirect("expense_list")
+            form.save()
+            messages.success(request, "Kategoriya yangilandi")
+            return redirect("category_list")
     else:
-        form = ExpenseForm()
-    return render(request, "finance/expense_list.html", {"expenses": expenses, "form": form})
+        form = CategoryForm(instance=category)
+    return render(request, "add_category.html", {"form": form})
+
+@login_required
+def delete_category(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+    if request.method == "POST":
+        category.delete()
+        messages.success(request, "Kategoriya o‘chirildi")
+        return redirect("category_list")
+    return render(request, "delete_category.html", {"category": category})
 
 
 @login_required
-def chart_data(request):
-    start_date = request.GET.get("start_date")
-    end_date = request.GET.get("end_date")
+def expense_category_list(request):
+    categories = ExpenseCategory.objects.all()
+    for cat in categories:
+        cat.total_expense = cat.expense_set.filter(user=request.user).aggregate(total=Sum('amount'))['total'] or 0
+    return render(request, "expense_category_list.html", {"categories": categories})
 
-    if start_date and end_date:
-        start = parse_date(start_date)
-        end = parse_date(end_date)
-        incomes = Income.objects.filter(user=request.user, date__range=[start, end])
-        expenses = Expense.objects.filter(user=request.user, date__range=[start, end])
-    else:
-        incomes = Income.objects.filter(user=request.user)
-        expenses = Expense.objects.filter(user=request.user)
-
-    # Sana bo‘yicha guruhlash
-    data = {}
-    for inc in incomes:
-        data.setdefault(str(inc.date), {"income": 0, "expense": 0})
-        data[str(inc.date)]["income"] += float(inc.amount)
-
-    for exp in expenses:
-        data.setdefault(str(exp.date), {"income": 0, "expense": 0})
-        data[str(exp.date)]["expense"] += float(exp.amount)
-
-    labels = sorted(data.keys())
-    income_data = [data[d]["income"] for d in labels]
-    expense_data = [data[d]["expense"] for d in labels]
-
-    return JsonResponse({
-        "labels": labels,
-        "income_data": income_data,
-        "expense_data": expense_data
+@login_required
+def expense_category_detail(request, pk):
+    category = get_object_or_404(ExpenseCategory, pk=pk)
+    expenses = category.expense_set.filter(user=request.user)
+    return render(request, "expense_category_detail.html", {
+        "category": category,
+        "expenses": expenses
     })
 
 @login_required
-def income_create(request):
+def add_expense_category(request):
     if request.method == "POST":
-        form = IncomeForm(request.POST, request.FILES)
+        form = ExpenseCategoryForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Chiqim kategoriyasi qo‘shildi")
+            return redirect("expense_category_list")
+    else:
+        form = ExpenseCategoryForm()
+    return render(request, "add_expense_category.html", {"form": form})
+
+@login_required
+def update_expense_category(request, pk):
+    category = get_object_or_404(ExpenseCategory, pk=pk)
+    if request.method == "POST":
+        form = ExpenseCategoryForm(request.POST, request.FILES, instance=category)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Chiqim kategoriyasi yangilandi")
+            return redirect("expense_category_list")
+    else:
+        form = ExpenseCategoryForm(instance=category)
+    return render(request, "add_expense_category.html", {"form": form})
+
+@login_required
+def delete_expense_category(request, pk):
+    category = get_object_or_404(ExpenseCategory, pk=pk)
+    if request.method == "POST":
+        category.delete()
+        messages.success(request, "Chiqim kategoriyasi o‘chirildi")
+        return redirect("expense_category_list")
+    return render(request, "delete_expense_category.html", {"category": category})
+
+
+
+@login_required
+def add_income(request, category_id=None):
+    category = None
+    if category_id:
+        category = get_object_or_404(Category, pk=category_id)
+    if request.method == "POST":
+        form = IncomeForm(request.POST)
         if form.is_valid():
             income = form.save(commit=False)
             income.user = request.user
+            if category:
+                income.category = category
             income.save()
-            return redirect("income_list")  # qo‘shilgandan keyin ro‘yxatga qaytadi
+            messages.success(request, "Kirim qo‘shildi")
+            return redirect('category_detail', pk=income.category.id)
     else:
-        form = IncomeForm()
-    return render(request, "finance/income_form.html", {"form": form})
+        form = IncomeForm(initial={"category": category})
+    return render(request, "add_income.html", {"form": form, "category": category})
 
-
-# ---------------- Chiqim qo‘shish ----------------
 @login_required
-def expense_create(request):
+def update_income(request, pk):
+    income = get_object_or_404(Income, pk=pk, user=request.user)
     if request.method == "POST":
-        form = ExpenseForm(request.POST, request.FILES)
+        form = IncomeForm(request.POST, instance=income)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Kirim yangilandi")
+            return redirect('category_detail', pk=income.category.id)
+    else:
+        form = IncomeForm(instance=income)
+    return render(request, "add_income.html", {"form": form, "category": income.category})
+
+@login_required
+def delete_income(request, pk):
+    income = get_object_or_404(Income, pk=pk, user=request.user)
+    if request.method == "POST":
+        category_id = income.category.id
+        income.delete()
+        messages.success(request, "Kirim o‘chirildi")
+        return redirect('category_detail', pk=category_id)
+    return render(request, "delete_income.html", {"income": income})
+
+
+
+@login_required
+def add_expense(request, category_id=None):
+    category = None
+    if category_id:
+        category = get_object_or_404(ExpenseCategory, pk=category_id)
+
+    if request.method == "POST":
+        form = ExpenseForm(request.POST)
         if form.is_valid():
             expense = form.save(commit=False)
             expense.user = request.user
+
+            if category:
+                expense.category = category
+            elif not expense.category:
+                messages.error(request, "Kategoriya tanlanmagan")
+                return redirect('expense_category_list')
+
             expense.save()
-            return redirect("expense_list")
+            messages.success(request, "Chiqim qo‘shildi")
+            return redirect('expense_category_detail', pk=expense.category.id)
     else:
-        form = ExpenseForm()
-    return render(request, "finance/expense_form.html", {"form": form})
+        form = ExpenseForm(initial={"category": category})
+
+    return render(request, "add_expense.html", {"form": form, "category": category})
+
+@login_required
+def update_expense(request, pk):
+    expense = get_object_or_404(Expense, pk=pk, user=request.user)
+    if request.method == "POST":
+        form = ExpenseForm(request.POST, instance=expense)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Chiqim yangilandi")
+            return redirect('expense_category_detail', pk=expense.category.id)
+    else:
+        form = ExpenseForm(instance=expense)
+    return render(request, "add_expense.html", {"form": form, "category": expense.category})
+
+@login_required
+def delete_expense(request, pk):
+    expense = get_object_or_404(Expense, pk=pk, user=request.user)
+    if request.method == "POST":
+        category_id = expense.category.id
+        expense.delete()
+        messages.success(request, "Chiqim o‘chirildi")
+        return redirect('expense_category_detail', pk=category_id)
+    return render(request, "delete_expense.html", {"expense": expense})
+
+

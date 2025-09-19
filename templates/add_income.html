@@ -1,0 +1,7 @@
+<h2>Kirim qo‘shish</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Qo‘shish</button>
+</form>
+<a href="{% url 'dashboard' %}">Dashboardga qaytish</a>

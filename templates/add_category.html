@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{% if form.instance.pk %}Kategoriya tahrirlash{% else %}Yangi kategoriya{% endif %}</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Saqlash</button>
+    <a href="{% url 'category_list' %}" class="btn btn-secondary">Ortga</a>
+</form>
+{% endblock %}
+ qaytish</a>

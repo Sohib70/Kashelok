@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from .models import CustomUser
-from django.contrib.auth.models import User
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -34,42 +33,27 @@ class LoginForm(AuthenticationForm):
     username = forms.CharField(label="Username / Email / Telefon")
     password = forms.CharField(label="Parol", widget=forms.PasswordInput)
 
-
 class ForgotPasswordForm(forms.Form):
-    username = forms.CharField(
-        label="Username",
-        widget=forms.TextInput(attrs={'placeholder': 'Username'})
-    )
+    username = forms.CharField(max_length=150, label="Username")
 
 class ResetPasswordForm(forms.Form):
-    code = forms.CharField(label="Emailga kelgan kod", widget=forms.TextInput(attrs={'placeholder': 'Kod'}))
-    old_pass = forms.CharField(label="Eski parol", widget=forms.PasswordInput(attrs={'placeholder': 'Eski parol'}))
-    new_pass = forms.CharField(label="Yangi parol", widget=forms.PasswordInput(attrs={'placeholder': 'Yangi parol'}))
-    confirm_pass = forms.CharField(label="Yangi parolni tasdiqlash", widget=forms.PasswordInput(attrs={'placeholder': 'Tasdiqlash'}))
-
+    code = forms.CharField(max_length=6, label="Kod")
+    new_pass = forms.CharField(widget=forms.PasswordInput, label="Yangi parol")
+    confirm_pass = forms.CharField(widget=forms.PasswordInput, label="Parolni tasdiqlash")
 
 class ProfileForm(forms.ModelForm):
     class Meta:
-        model = CustomUser
-        fields = ["username", "first_name", "last_name", "email", "image"]
+        model = User
+        fields = ["username", "email", "first_name", "last_name","image"]
         widgets = {
             "username": forms.TextInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
             "first_name": forms.TextInput(attrs={"class": "form-control"}),
             "last_name": forms.TextInput(attrs={"class": "form-control"}),
-            "email": forms.EmailInput(attrs={"class": "form-control"}),
         }
 
+class CustomPasswordChangeForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), label="Eski parol")
+    new_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), label="Yangi parol")
+    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), label="Yangi parolni tasdiqlash")
 
-class CustomPasswordChangeForm(PasswordChangeForm):
-    old_password = forms.CharField(
-        label="Eski parol",
-        widget=forms.PasswordInput(attrs={"class": "form-control"})
-    )
-    new_password1 = forms.CharField(
-        label="Yangi parol",
-        widget=forms.PasswordInput(attrs={"class": "form-control"})
-    )
-    new_password2 = forms.CharField(
-        label="Yangi parolni tasdiqlash",
-        widget=forms.PasswordInput(attrs={"class": "form-control"})
-    )

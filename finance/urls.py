@@ -4,16 +4,24 @@ from . import views
 urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
 
-    # kirim
-    path("incomes/", views.income_list, name="income_list"),
-    path("incomes/add/", views.income_create, name="income_create"),
+    path("categories/", views.category_list, name="category_list"),
+    path("add-category/", views.add_category, name="add_category"),
+    path('categories/<int:pk>/edit/', views.update_category, name='update_category'),
+    path('categories/<int:pk>/', views.category_detail, name='category_detail'),
+    path('categories/<int:pk>/delete/', views.delete_category, name='delete_category'),
 
-    # chiqim
-    path("expenses/", views.expense_list, name="expense_list"),
-    path("expenses/add/", views.expense_create, name="expense_create"),
+    path("expense-categories/", views.expense_category_list, name="expense_category_list"),
+    path("add-expense-category/", views.add_expense_category, name="add_expense_category"),
+    path('expense-categories/<int:pk>/edit/', views.update_expense_category, name='update_expense_category'),
+    path('expense-categories/<int:pk>/', views.expense_category_detail, name='expense_category_detail'),
+    path('expense-categories/<int:pk>/delete/', views.delete_expense_category, name='delete_expense_category'),
 
-    path("chart-data/", views.chart_data, name="chart_data"),
+    path("add-income/<int:category_id>/", views.add_income, name="add_income"),
+    path('income/<int:pk>/edit/', views.update_income, name='update_income'),
+    path('income/<int:pk>/delete/', views.delete_income, name='delete_income'),
 
-    path("kirim/", views.kirim_list, name="kirim_list"),
-    path("chiqim/", views.chiqim_list, name="chiqim_list"),
+    path("add-expense/<int:category_id>/", views.add_expense, name="add_expense"),
+    path('expense/<int:pk>/edit/', views.update_expense, name='update_expense'),
+    path('expense/<int:pk>/delete/', views.delete_expense, name='delete_expense'),
+
 ]
