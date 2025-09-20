@@ -3,11 +3,13 @@ from django.contrib.auth.forms import AuthenticationForm
 from .models import CustomUser
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
+
 User = get_user_model()
 
 class SignUpForm(forms.ModelForm):
-    password1 = forms.CharField(widget=forms.PasswordInput, label="Parol")
-    password2 = forms.CharField(widget=forms.PasswordInput, label="Parolni tasdiqlang")
+    password1 = forms.CharField(widget=forms.PasswordInput, label=_("Parol"))
+    password2 = forms.CharField(widget=forms.PasswordInput, label=_("Parolni tasdiqlang"))
 
     class Meta:
         model = CustomUser
@@ -18,7 +20,7 @@ class SignUpForm(forms.ModelForm):
         p1 = cleaned_data.get("password1")
         p2 = cleaned_data.get("password2")
         if p1 and p2 and p1 != p2:
-            raise forms.ValidationError("Parollar mos emas")
+            raise forms.ValidationError(_("Parollar mos emas"))
         return cleaned_data
 
     def save(self, commit=True):
@@ -30,16 +32,19 @@ class SignUpForm(forms.ModelForm):
 
 
 class LoginForm(AuthenticationForm):
-    username = forms.CharField(label="Username / Email / Telefon")
-    password = forms.CharField(label="Parol", widget=forms.PasswordInput)
+    username = forms.CharField(label=_("Username / Email / Telefon"))
+    password = forms.CharField(label=_("Parol"), widget=forms.PasswordInput)
+
 
 class ForgotPasswordForm(forms.Form):
-    username = forms.CharField(max_length=150, label="Username")
+    username = forms.CharField(max_length=150, label=_("Username"))
+
 
 class ResetPasswordForm(forms.Form):
-    code = forms.CharField(max_length=6, label="Kod")
-    new_pass = forms.CharField(widget=forms.PasswordInput, label="Yangi parol")
-    confirm_pass = forms.CharField(widget=forms.PasswordInput, label="Parolni tasdiqlash")
+    code = forms.CharField(max_length=6, label=_("Kod"))
+    new_pass = forms.CharField(widget=forms.PasswordInput, label=_("Yangi parol"))
+    confirm_pass = forms.CharField(widget=forms.PasswordInput, label=_("Parolni tasdiqlash"))
+
 
 class ProfileForm(forms.ModelForm):
     class Meta:
@@ -52,8 +57,8 @@ class ProfileForm(forms.ModelForm):
             "last_name": forms.TextInput(attrs={"class": "form-control"}),
         }
 
-class CustomPasswordChangeForm(forms.Form):
-    old_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), label="Eski parol")
-    new_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), label="Yangi parol")
-    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), label="Yangi parolni tasdiqlash")
 
+class CustomPasswordChangeForm(forms.Form):
+    old_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), label=_("Eski parol"))
+    new_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), label=_("Yangi parol"))
+    confirm_password = forms.CharField(widget=forms.PasswordInput(attrs={"class": "form-control"}), label=_("Yangi parolni tasdiqlash"))

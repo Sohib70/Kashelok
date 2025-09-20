@@ -1,8 +1,9 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
-<h2>Kategoriyalar</h2>
-<a href="{% url 'add_category' %}" class="btn btn-primary mb-3">Yangi kategoriya qo‘shish</a>
+<h2>{% trans "Kategoriyalar" %}</h2>
+<a href="{% url 'add_category' %}" class="btn btn-primary mb-3">{% trans "Yangi kategoriya qo‘shish" %}</a>
 
 <div class="row">
     {% for category in categories %}
@@ -18,16 +19,16 @@
                     <a href="{% url 'category_detail' category.id %}">{{ category.name }}</a>
                 </h5>
                 <!-- Jami kirim qo‘shildi -->
-                <p><strong>Jami kirim: </strong>{{ category.total_income }}</p>
+                <p><strong>{% trans "Jami kirim" %}: </strong>{{ category.total_income }}</p>
                 <div class="d-flex justify-content-center gap-2 mt-2">
-                    <a href="{% url 'update_category' category.pk %}" class="btn btn-sm btn-warning">Tahrirlash</a>
-                    <a href="{% url 'delete_category' category.pk %}" class="btn btn-sm btn-danger">O‘chirish</a>
+                    <a href="{% url 'update_category' category.pk %}" class="btn btn-sm btn-warning">{% trans "Tahrirlash" %}</a>
+                    <a href="{% url 'delete_category' category.pk %}" class="btn btn-sm btn-danger">{% trans "O‘chirish" %}</a>
                 </div>
             </div>
         </div>
     </div>
     {% empty %}
-    <p>Hozircha kategoriya mavjud emas.</p>
+    <p>{% trans "Hozircha kategoriya mavjud emas." %}</p>
     {% endfor %}
 </div>
 {% endblock %}

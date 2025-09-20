@@ -1,5 +1,6 @@
 from .models import UserBalance
 from django.utils.formats import number_format
+from django.utils.translation import gettext_lazy as _
 
 def user_balance(request):
     if request.user.is_authenticated:

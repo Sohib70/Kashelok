@@ -6,6 +6,7 @@ from .models import Income, Expense, Category, ExpenseCategory, UserBalance
 from .forms import IncomeForm, CategoryForm, ExpenseCategoryForm, ExpenseForm
 from datetime import datetime, timedelta
 from decimal import Decimal
+from django.utils.translation import gettext_lazy as _
 
 @login_required
 def dashboard(request):
@@ -53,7 +54,7 @@ def dashboard(request):
     balance = kirim_sum - chiqim_sum
 
     income_categories = []
-    for cat in Category.objects.all():
+    for cat in Category.objects.filter(user=user):
         total = kirimlar.filter(category=cat).aggregate(total=Sum('amount'))['total'] or 0
         if total > 0:
             cat.sum = total
@@ -61,7 +62,7 @@ def dashboard(request):
             income_categories.append(cat)
 
     expense_categories = []
-    for cat in ExpenseCategory.objects.all():
+    for cat in ExpenseCategory.objects.filter(user=user):
         total = chiqimlar.filter(category=cat).aggregate(total=Sum('amount'))['total'] or 0
         if total > 0:
             cat.sum = total
@@ -98,7 +99,7 @@ def category_list(request):
 
 @login_required
 def category_detail(request, pk):
-    category = get_object_or_404(Category, pk=pk)
+    category = get_object_or_404(Category, pk=pk, user=request.user)
     incomes = category.income_set.filter(user=request.user)
     return render(request, "category_detail.html", {"category": category, "incomes": incomes})
 
@@ -107,7 +108,9 @@ def add_category(request):
     if request.method == "POST":
         form = CategoryForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            category = form.save(commit=False)
+            category.user = request.user
+            category.save()
             return redirect("category_list")
     else:
         form = CategoryForm()
@@ -115,12 +118,12 @@ def add_category(request):
 
 @login_required
 def update_category(request, pk):
-    category = get_object_or_404(Category, pk=pk)
+    category = get_object_or_404(Category, pk=pk, user=request.user)
     if request.method == "POST":
         form = CategoryForm(request.POST, request.FILES, instance=category)
         if form.is_valid():
             form.save()
-            messages.success(request, "Kategoriya yangilandi")
+            messages.success(request, _("Kategoriya yangilandi"))
             return redirect("category_list")
     else:
         form = CategoryForm(instance=category)
@@ -128,10 +131,10 @@ def update_category(request, pk):
 
 @login_required
 def delete_category(request, pk):
-    category = get_object_or_404(Category, pk=pk)
+    category = get_object_or_404(Category, pk=pk, user=request.user)
     if request.method == "POST":
         category.delete()
-        messages.success(request, "Kategoriya o‘chirildi")
+        messages.success(request, _("Kategoriya o‘chirildi"))
         return redirect("category_list")
     return render(request, "delete_category.html", {"category": category})
 
@@ -145,7 +148,7 @@ def expense_category_list(request):
 
 @login_required
 def expense_category_detail(request, pk_e):
-    category = get_object_or_404(ExpenseCategory, pk=pk_e)
+    category = get_object_or_404(ExpenseCategory, pk=pk_e, user=request.user)
     expenses = category.expense_set.filter(user=request.user)
     return render(request, "expense_category_detail.html", {"category": category, "expenses": expenses})
 
@@ -154,8 +157,10 @@ def add_expense_category(request):
     if request.method == "POST":
         form = ExpenseCategoryForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Chiqim kategoriyasi qo‘shildi")
+            category = form.save(commit=False)
+            category.user = request.user
+            category.save()
+            messages.success(request, _("Chiqim kategoriyasi qo‘shildi"))
             return redirect("expense_category_list")
     else:
         form = ExpenseCategoryForm()
@@ -163,12 +168,12 @@ def add_expense_category(request):
 
 @login_required
 def update_expense_category(request, pk_e):
-    category = get_object_or_404(ExpenseCategory, pk=pk_e)
+    category = get_object_or_404(ExpenseCategory, pk=pk_e, user=request.user)
     if request.method == "POST":
         form = ExpenseCategoryForm(request.POST, request.FILES, instance=category)
         if form.is_valid():
             form.save()
-            messages.success(request, "Chiqim kategoriyasi yangilandi")
+            messages.success(request, _("Chiqim kategoriyasi yangilandi"))
             return redirect("expense_category_list")
     else:
         form = ExpenseCategoryForm(instance=category)
@@ -176,10 +181,10 @@ def update_expense_category(request, pk_e):
 
 @login_required
 def delete_expense_category(request, pk_e):
-    category = get_object_or_404(ExpenseCategory, pk=pk_e)
+    category = get_object_or_404(ExpenseCategory, pk=pk_e, user=request.user)
     if request.method == "POST":
         category.delete()
-        messages.success(request, "Chiqim kategoriyasi o‘chirildi")
+        messages.success(request, _("Chiqim kategoriyasi o‘chirildi"))
         return redirect("expense_category_list")
     return render(request, "delete_expense_category.html", {"category": category})
 
@@ -188,7 +193,7 @@ def delete_expense_category(request, pk_e):
 def add_income(request, pk=None):
     category = None
     if pk:
-        category = get_object_or_404(Category, pk=pk)
+        category = get_object_or_404(Category, pk=pk, user=request.user)
 
     if request.method == "POST":
         form = IncomeForm(request.POST)
@@ -208,7 +213,7 @@ def add_income(request, pk=None):
                 balance_obj.dollar += Decimal(income.amount)
             balance_obj.save()
 
-            messages.success(request, "Kirim qo‘shildi va balans yangilandi")
+            messages.success(request, _("Kirim qo‘shildi va balans yangilandi"))
             return redirect('category_detail', pk=income.category.id)
     else:
         form = IncomeForm(initial={"category": category})
@@ -241,7 +246,7 @@ def update_income(request, pk):
                 balance_obj.dollar += income.amount
             balance_obj.save()
 
-            messages.success(request, "Kirim yangilandi va balans tuzatildi")
+            messages.success(request, _("Kirim yangilandi va balans tuzatildi"))
             return redirect('category_detail', pk=income.category.id)
     else:
         form = IncomeForm(instance=income)
@@ -263,7 +268,7 @@ def delete_income(request, pk):
 
         category_id = income.category.id
         income.delete()
-        messages.success(request, "Kirim o‘chirildi va balans tuzatildi")
+        messages.success(request, _("Kirim o‘chirildi va balans tuzatildi"))
         return redirect('category_detail', pk=category_id)
     return render(request, "delete_income.html", {"income": income})
 
@@ -272,7 +277,7 @@ def delete_income(request, pk):
 def add_expense(request, pk_e=None):
     category = None
     if pk_e:
-        category = get_object_or_404(ExpenseCategory, pk=pk_e)
+        category = get_object_or_404(ExpenseCategory, pk=pk_e, user=request.user)
 
     if request.method == "POST":
         form = ExpenseForm(request.POST)
@@ -282,7 +287,7 @@ def add_expense(request, pk_e=None):
             if category:
                 expense.category = category
             elif not expense.category:
-                messages.error(request, "Kategoriya tanlanmagan")
+                messages.error(request, _("Kategoriya tanlanmagan"))
                 return redirect('expense_category_list')
 
             expense.save()
@@ -300,7 +305,7 @@ def add_expense(request, pk_e=None):
 
             balance_obj.save()
 
-            messages.success(request, "Chiqim qo‘shildi va balans yangilandi")
+            messages.success(request, _("Chiqim qo‘shildi va balans yangilandi"))
             return redirect('expense_category_detail', pk_e=expense.category.id)
     else:
         form = ExpenseForm(initial={"category": category})
@@ -334,7 +339,7 @@ def update_expense(request, pk):
                 balance_obj.dollar -= expense.amount
             balance_obj.save()
 
-            messages.success(request, "Chiqim yangilandi va balans tuzatildi")
+            messages.success(request, _("Chiqim yangilandi va balans tuzatildi"))
             return redirect('expense_category_detail', pk_e=expense.category.id)
     else:
         form = ExpenseForm(instance=expense)
@@ -356,7 +361,7 @@ def delete_expense(request, pk):
 
         category_id = expense.category.id
         expense.delete()
-        messages.success(request, "Chiqim o‘chirildi va balans tuzatildi")
+        messages.success(request, _("Chiqim o‘chirildi va balans tuzatildi"))
         return redirect('expense_category_detail', pk_e=category_id)
     return render(request, "delete_expense.html", {"expense": expense})
 
@@ -375,7 +380,7 @@ def update_balance(request):
         balance_obj.dollar = Decimal(dollar)
         balance_obj.save()
 
-        messages.success(request, "Balans yangilandi")
+        messages.success(request, _("Balans yangilandi"))
         return redirect("dashboard")
 
     return redirect("dashboard")

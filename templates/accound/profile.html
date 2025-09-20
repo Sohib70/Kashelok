@@ -1,8 +1,9 @@
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Profil sahifasi</title>
+    <title>{% trans "Profil sahifasi" %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -38,20 +39,20 @@
 <body>
 
 <div class="profile-card">
-    <h2>Profil sahifasi</h2>
+    <h2>{% trans "Profil sahifasi" %}</h2>
 
     <div class="text-center mb-4">
         {% if user.image %}
-            <img src="{{ user.image.url }}" alt="Profil rasmi" class="profile-img">
+            <img src="{{ user.image.url }}" alt="{% trans 'Profil rasmi' %}" class="profile-img">
         {% else %}
-            <img src="https://via.placeholder.com/150" alt="Profil rasmi" class="profile-img">
+            <img src="https://via.placeholder.com/150" alt="{% trans 'Profil rasmi' %}" class="profile-img">
         {% endif %}
     </div>
 
     <form method="POST" enctype="multipart/form-data" class="mb-4">
         {% csrf_token %}
         {{ profile_form.as_p }}
-        <button type="submit" name="update_profile" class="btn btn-primary btn-block">Profilni yangilash</button>
+        <button type="submit" name="update_profile" class="btn btn-primary btn-block">{% trans "Profilni yangilash" %}</button>
     </form>
 
     <hr>
@@ -59,11 +60,11 @@
     <form method="POST">
         {% csrf_token %}
         {{ password_form.as_p }}
-        <button type="submit" name="change_password" class="btn btn-warning btn-block">Parolni o'zgartirish</button>
+        <button type="submit" name="change_password" class="btn btn-warning btn-block">{% trans "Parolni o'zgartirish" %}</button>
     </form>
 
     <div class="text-center back-btn">
-        <a href="{% url 'dashboard' %}" class="btn btn-secondary">Bosh sahifaga qaytish</a>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">{% trans "Bosh sahifaga qaytish" %}</a>
     </div>
 </div>
 

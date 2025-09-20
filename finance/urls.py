@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.utils.translation import gettext_lazy as _
 
 urlpatterns = [
     path("dashboard/", views.dashboard, name="dashboard"),
@@ -25,5 +26,6 @@ urlpatterns = [
     path('expense/<int:pk>/delete/', views.delete_expense, name='delete_expense'),
 
     path("update-balance/", views.update_balance, name="update_balance"),
+
 ]
 

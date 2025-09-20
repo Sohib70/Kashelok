@@ -1,6 +1,8 @@
+{% load i18n %}
+
 {% if user.is_authenticated %}
-  <p>Xush kelibsiz, {{ user.username }}!</p>
-  <a href="{% url 'logout' %}">Chiqish</a>
+  <p>{% trans "Xush kelibsiz," %} {{ user.username }}!</p>
+  <a href="{% url 'logout' %}">{% trans "Chiqish" %}</a>
 {% else %}
-  <a href="{% url 'login' %}">Kirish</a>
+  <a href="{% url 'login' %}">{% trans "Kirish" %}</a>
 {% endif %}

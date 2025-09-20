@@ -1,17 +1,18 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block content %}
-<h2>{{ category.name }} kategoriyasi chiqimlari</h2>
-<p><strong>Jami chiqim:</strong> {{ total_expense }} so'm</p>
-<a href="{% url 'add_expense' category.id %}" class="btn btn-primary mb-3">Yangi chiqim qo‘shish</a>
+<h2>{{ category.name }} {% trans "kategoriyasi chiqimlari" %}</h2>
+<p><strong>{% trans "Jami chiqim:" %}</strong> {{ total_expense }} {% trans "so'm" %}</p>
+<a href="{% url 'add_expense' category.id %}" class="btn btn-primary mb-3">{% trans "Yangi chiqim qo‘shish" %}</a>
 
 <table class="table table-bordered">
     <thead>
         <tr>
             <th>#</th>
-            <th>Miqdor</th>
-            <th>Izoh</th>
-            <th>Sana</th>
-            <th>Amallar</th>
+            <th>{% trans "Miqdor" %}</th>
+            <th>{% trans "Izoh" %}</th>
+            <th>{% trans "Sana" %}</th>
+            <th>{% trans "Amallar" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -22,13 +23,13 @@
             <td>{{ expense.comment }}</td>
             <td>{{ expense.date }}</td>
             <td>
-                <a href="{% url 'update_expense' expense.pk %}" class="btn btn-sm btn-warning">Tahrirlash</a>
-                <a href="{% url 'delete_expense' expense.pk %}" class="btn btn-sm btn-danger">O‘chirish</a>
+                <a href="{% url 'update_expense' expense.pk %}" class="btn btn-sm btn-warning">{% trans "Tahrirlash" %}</a>
+                <a href="{% url 'delete_expense' expense.pk %}" class="btn btn-sm btn-danger">{% trans "O‘chirish" %}</a>
             </td>
         </tr>
         {% empty %}
         <tr>
-            <td colspan="5">Hozircha chiqim mavjud emas.</td>
+            <td colspan="5">{% trans "Hozircha chiqim mavjud emas." %}</td>
         </tr>
         {% endfor %}
     </tbody>

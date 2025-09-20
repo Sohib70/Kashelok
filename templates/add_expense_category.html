@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
-<h2>Yangi Chiqim Kategoriyasi Qo‘shish</h2>
+<h2>{% trans "Yangi Chiqim Kategoriyasi Qo‘shish" %}</h2>
 
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Saqlash</button>
-    <a href="{% url 'expense_category_list' %}" class="btn btn-secondary">Orqaga</a>
+    <button type="submit" class="btn btn-primary">{% trans "Saqlash" %}</button>
+    <a href="{% url 'expense_category_list' %}" class="btn btn-secondary">{% trans "Orqaga" %}</a>
 </form>
 {% endblock %}

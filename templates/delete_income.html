@@ -1,10 +1,11 @@
 {% extends "base.html" %}
+{% load i18n %}
 {% block content %}
-<h2>Kirim o‘chirish</h2>
-<p>Haqiqatan ham {{ income.amount }} kirimini o‘chirmoqchimisiz?</p>
+<h2>{% trans "Kirim o‘chirish" %}</h2>
+<p>{% blocktrans %}Haqiqatan ham {{ income.amount }} kirimini o‘chirmoqchimisiz?{% endblocktrans %}</p>
 <form method="post">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Ha, o‘chirish</button>
-    <a href="{% url 'category_detail' income.category.id %}" class="btn btn-secondary">Bekor qilish</a>
+    <button type="submit" class="btn btn-danger">{% trans "Ha, o‘chirish" %}</button>
+    <a href="{% url 'category_detail' income.category.id %}" class="btn btn-secondary">{% trans "Bekor qilish" %}</a>
 </form>
 {% endblock %}

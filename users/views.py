@@ -9,6 +9,7 @@ from .utils import generate_code, send_to_mail
 from .models import CustomUser
 from django.contrib.auth import get_user_model
 from .forms import ProfileForm, CustomPasswordChangeForm
+from django.utils.translation import gettext_lazy as _
 
 User = get_user_model()
 
@@ -17,14 +18,13 @@ def signup_view(request):
         form = SignUpForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request, "Royxatdan otish muvaffaqiyatli! Endi login qiling.")
+            messages.success(request, _("Ro‘yxatdan o‘tish muvaffaqiyatli! Endi login qiling."))
             return redirect("login")
         else:
-            messages.error(request, "Malumotlar notogri. Qayta tekshiring.")
+            messages.error(request, _("Ma’lumotlar noto‘g‘ri. Qayta tekshiring."))
     else:
         form = SignUpForm()
     return render(request, "accound/signup.html", {"form": form})
-
 
 
 def login_view(request):
@@ -52,7 +52,7 @@ def forgot_password(request):
             try:
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
-                messages.error(request, "Bunday username bazada mavjud emas")
+                messages.error(request, _("Bunday username bazada mavjud emas"))
                 return render(request, "forgot_password.html", {"form": form})
 
             code = generate_code()
@@ -60,8 +60,7 @@ def forgot_password(request):
             request.session["reset_user"] = user.id
             request.session["reset_code_time"] = timezone.now().timestamp()
             send_to_mail(user.email, code)
-            print(code)
-            messages.success(request, "Kod sizning email manzilingizga yuborildi (2 daqiqa ichida amal qiladi)")
+            messages.success(request, _("Kod sizning email manzilingizga yuborildi (2 daqiqa ichida amal qiladi)"))
             return redirect("reset_password")
     else:
         form = ForgotPasswordForm()
@@ -77,20 +76,20 @@ def reset_password(request):
             confirm_pass = form.cleaned_data["confirm_pass"]
 
             if "reset_code" not in request.session or "reset_user" not in request.session:
-                messages.error(request, "Avval username kiritib kodni oling")
+                messages.error(request, _("Avval username kiritib kodni oling"))
                 return redirect("forgot_password")
 
             code_time = request.session.get("reset_code_time")
             if code_time is None or timezone.now().timestamp() - code_time > 120:
-                messages.error(request, "Kod muddati tugagan, iltimos yangi kod oling")
+                messages.error(request, _("Kod muddati tugagan, iltimos yangi kod oling"))
                 return redirect("forgot_password")
 
             if code != request.session["reset_code"]:
-                messages.error(request, "Kod xato kiritildi")
+                messages.error(request, _("Kod xato kiritildi"))
                 return render(request, "accound/reset_password.html", {"form": form})
 
             if new_pass != confirm_pass:
-                messages.error(request, "Parollar mos kelmadi")
+                messages.error(request, _("Parollar mos kelmadi"))
                 return render(request, "accound/reset_password.html", {"form": form})
 
             user_id = request.session["reset_user"]
@@ -102,7 +101,7 @@ def reset_password(request):
             del request.session["reset_user"]
             del request.session["reset_code_time"]
 
-            messages.success(request, "Parol muvaffaqiyatli o'zgartirildi")
+            messages.success(request, _("Parol muvaffaqiyatli o‘zgartirildi"))
             return redirect("login")
     else:
         form = ResetPasswordForm()
@@ -117,7 +116,7 @@ def profile_view(request):
         profile_form = ProfileForm(request.POST, request.FILES, instance=user)
         if profile_form.is_valid():
             profile_form.save()
-            messages.success(request, "Profil muvaffaqiyatli yangilandi")
+            messages.success(request, _("Profil muvaffaqiyatli yangilandi"))
             return redirect("profile")
     else:
         profile_form = ProfileForm(instance=user)
@@ -130,16 +129,16 @@ def profile_view(request):
             confirm_pass = password_form.cleaned_data["confirm_password"]
 
             if not user.check_password(old_pass):
-                messages.error(request, "Eski parol noto‘g‘ri")
+                messages.error(request, _("Eski parol noto‘g‘ri"))
             elif old_pass == new_pass:
-                messages.error(request, "Eski va yangi parol bir xil bo‘lishi mumkin emas")
+                messages.error(request, _("Eski va yangi parol bir xil bo‘lishi mumkin emas"))
             elif new_pass != confirm_pass:
-                messages.error(request, "Yangi parol va tasdiqlash paroli mos kelmadi")
+                messages.error(request, _("Yangi parol va tasdiqlash paroli mos kelmadi"))
             else:
                 user.set_password(new_pass)
                 user.save()
                 update_session_auth_hash(request, user)
-                messages.success(request, "Parol muvaffaqiyatli o‘zgartirildi")
+                messages.success(request, _("Parol muvaffaqiyatli o‘zgartirildi"))
                 return redirect("profile")
     else:
         password_form = CustomPasswordChangeForm()

@@ -1,0 +1,182 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Kashelok 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-09-20 05:18+0500\n"
+"PO-Revision-Date: 2025-09-20 05:18+0500\n"
+"Last-Translator: Sohib Xolburiyev <>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\conf\settings.py:127
+msgid "O‘zbek"
+msgstr "Узбекский"
+
+#: .\conf\settings.py:128 .\templates\base.html:70
+msgid "Русский"
+msgstr "Русский"
+
+#: .\conf\settings.py:129
+msgid "English"
+msgstr "Английский"
+
+#: .\finance\forms.py:24 .\finance\models.py:36 .\finance\models.py:53
+msgid "Naqd"
+msgstr "Наличные"
+
+#: .\finance\forms.py:25 .\finance\models.py:37 .\finance\models.py:54
+msgid "Karta"
+msgstr "Карта"
+
+#: .\finance\forms.py:26 .\finance\models.py:38 .\finance\models.py:55
+msgid "Dollar"
+msgstr "Доллар"
+
+#: .\finance\views.py:126
+msgid "Kategoriya yangilandi"
+msgstr "Категория обновлена"
+
+#: .\finance\views.py:137
+msgid "Kategoriya o‘chirildi"
+msgstr "Категория удалена"
+
+#: .\finance\views.py:163
+msgid "Chiqim kategoriyasi qo‘shildi"
+msgstr "Категория расходов добавлена"
+
+#: .\finance\views.py:176
+msgid "Chiqim kategoriyasi yangilandi"
+msgstr "Категория расходов обновлена"
+
+#: .\finance\views.py:187
+msgid "Chiqim kategoriyasi o‘chirildi"
+msgstr "Категория расходов удалена"
+
+#: .\finance\views.py:216
+msgid "Kirim qo‘shildi va balans yangilandi"
+msgstr "Доход добавлен и баланс обновлен"
+
+#: .\finance\views.py:249
+msgid "Kirim yangilandi va balans tuzatildi"
+msgstr "Доход обновлен и баланс исправлен"
+
+#: .\finance\views.py:271
+msgid "Kirim o‘chirildi va balans tuzatildi"
+msgstr "Доход удален и баланс исправлен"
+
+#: .\finance\views.py:290
+msgid "Kategoriya tanlanmagan"
+msgstr "Категория не выбрана"
+
+#: .\finance\views.py:308
+msgid "Chiqim qo‘shildi va balans yangilandi"
+msgstr "Расход добавлен и баланс обновлен"
+
+#: .\finance\views.py:342
+msgid "Chiqim yangilandi va balans tuzatildi"
+msgstr "Расход обновлен и баланс исправлен"
+
+#: .\finance\views.py:364
+msgid "Chiqim o‘chirildi va balans tuzatildi"
+msgstr "Расход удален и баланс исправлен"
+
+#: .\finance\views.py:383
+msgid "Balans yangilandi"
+msgstr "Баланс обновлен"
+
+#: .\templates\accound\forgot_password.html:7
+#: .\templates\accound\forgot_password.html:33
+#: .\templates\accound\reset_password.html:6
+#: .\templates\accound\reset_password.html:21
+msgid "Parolni tiklash"
+msgstr "Сброс пароля"
+
+#: .\templates\accound\forgot_password.html:38
+msgid "Kod yuborish"
+msgstr "Отправить код"
+
+#: .\templates\accound\forgot_password.html:41
+msgid "Login sahifasiga qaytish"
+msgstr "Вернуться к входу"
+
+#: .\templates\accound\login.html:6 .\templates\accound\login.html:17
+#: .\templates\accound\login.html:48 .\templates\accound\logout.html:7
+#: .\templates\accound\signup.html:91
+msgid "Kirish"
+msgstr "Вход"
+
+#: .\templates\accound\login.html:39
+msgid "Login / Email / Telefon"
+msgstr "Логин / Email / Телефон"
+
+#: .\templates\accound\login.html:40
+msgid "Login yoki email yoki telefon"
+msgstr "Введите логин, email или телефон"
+
+#: .\templates\accound\login.html:44 .\users\forms.py:11 .\users\forms.py:36
+msgid "Parol"
+msgstr "Пароль"
+
+#: .\templates\accound\login.html:45
+msgid "Parolni kiriting"
+msgstr "Введите пароль"
+
+#: .\templates\accound\login.html:51 .\templates\accound\signup.html:7
+#: .\templates\accound\signup.html:38 .\templates\accound\signup.html:87
+msgid "Ro‘yxatdan o‘tish"
+msgstr "Регистрация"
+
+#: .\templates\accound\login.html:52
+msgid "Parolni unutdingizmi?"
+msgstr "Забыли пароль?"
+
+#: .\templates\accound\logout.html:4
+msgid "Xush kelibsiz,"
+msgstr "Добро пожаловать,"
+
+#: .\templates\accound\logout.html:5 .\templates\base.html:106
+msgid "Chiqish"
+msgstr "Выход"
+
+#: .\templates\accound\profile.html:6 .\templates\accound\profile.html:42
+msgid "Profil sahifasi"
+msgstr "Страница профиля"
+
+#: .\templates\accound\profile.html:46 .\templates\accound\profile.html:48
+#: .\templates\base.html:38
+msgid "Profil rasmi"
+msgstr "Фото профиля"
+
+#: .\templates\accound\profile.html:55
+msgid "Profilni yangilash"
+msgstr "Обновить профиль"
+
+#: .\templates\accound\profile.html:63
+msgid "Parolni o'zgartirish"
+msgstr "Изменить пароль"
+
+#: .\templates\accound\profile.html:67
+msgid "Bosh sahifaga qaytish"
+msgstr "Вернуться на главную"
+
+#: .\templates\accound\reset_password.html:24
+msgid "Emailga kelgan kod"
+msgstr "Код из email"
+
+#: .\templates\accound\reset_password.html:25 .\users\forms.py:45
+#: .\users\forms.py:63
+msgid "Yangi parol"
+msgstr "Новый пароль"
+
+#: .\templates\accound\reset_password.html:26 .\users\forms.py:64
+msgid "Yangi parolni tasdiqlash"
+msgstr "Подтвердите новый пароль"
+
+#: .\templates\accound\reset_password.html:27
+msgid "Parolni o‘zgartirish"
+msgstr "Изменить пароль"
+

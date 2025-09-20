@@ -1,5 +1,6 @@
 from django import forms
-from .models import Income, Category, Expense, ExpenseCategory,UserBalance
+from .models import Income, Category, Expense, ExpenseCategory, UserBalance
+from django.utils.translation import gettext_lazy as _
 
 class CategoryForm(forms.ModelForm):
     class Meta:
@@ -20,9 +21,9 @@ class ExpenseCategoryForm(forms.ModelForm):
         }
 
 PAYMENT_CHOICES = (
-    ('cash', 'Naqd'),
-    ('card', 'Karta'),
-    ('dollar', 'Dollar'),
+    ('cash', _('Naqd')),
+    ('card', _('Karta')),
+    ('dollar', _('Dollar')),
 )
 
 class IncomeForm(forms.ModelForm):

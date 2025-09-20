@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from datetime import datetime
+from django.utils.translation import gettext_lazy as _
 
 class Category(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -32,9 +33,9 @@ class ExpenseCategory(models.Model):
 
 class Income(models.Model):
     PAYMENT_CHOICES = (
-        ('cash', 'Naqd'),
-        ('card', 'Karta'),
-        ('dollar', 'Dollar'),
+        ('cash', _('Naqd')),
+        ('card', _('Karta')),
+        ('dollar', _('Dollar')),
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
@@ -49,9 +50,9 @@ class Income(models.Model):
 
 class Expense(models.Model):
     PAYMENT_CHOICES = (
-        ('cash', 'Naqd'),
-        ('card', 'Karta'),
-        ('dollar', 'Dollar'),
+        ('cash', _('Naqd')),
+        ('card', _('Karta')),
+        ('dollar', _('Dollar')),
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     category = models.ForeignKey(ExpenseCategory, on_delete=models.CASCADE)

@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% load i18n %}
 
 {% block content %}
-<h2>Chiqim Kategoriyalari</h2>
+<h2>{% trans "Chiqim Kategoriyalari" %}</h2>
 
-<a href="{% url 'add_expense_category' %}" class="btn btn-primary mb-3">Yangi chiqim kategoriyasi qo‘shish</a>
+<a href="{% url 'add_expense_category' %}" class="btn btn-primary mb-3">{% trans "Yangi chiqim kategoriyasi qo‘shish" %}</a>
 
 <div class="row">
     {% for category in categories %}
@@ -18,16 +19,16 @@
                 <h5 class="card-title">
                     <a href="{% url 'expense_category_detail' category.id %}">{{ category.name }}</a>
                 </h5>
-                <p><strong>Jami chiqim: </strong>{{ category.total_expense }}</p>
+                <p><strong>{% trans "Jami chiqim:" %}</strong> {{ category.total_expense }}</p>
                 <div class="d-flex justify-content-center gap-2 mt-2">
-                    <a href="{% url 'update_expense_category' category.pk %}" class="btn btn-sm btn-warning">Tahrirlash</a>
-                    <a href="{% url 'delete_expense_category' category.pk %}" class="btn btn-sm btn-danger">O‘chirish</a>
+                    <a href="{% url 'update_expense_category' category.pk %}" class="btn btn-sm btn-warning">{% trans "Tahrirlash" %}</a>
+                    <a href="{% url 'delete_expense_category' category.pk %}" class="btn btn-sm btn-danger">{% trans "O‘chirish" %}</a>
                 </div>
             </div>
         </div>
     </div>
     {% empty %}
-    <p>Hozircha chiqim kategoriyalari mavjud emas.</p>
+    <p>{% trans "Hozircha chiqim kategoriyalari mavjud emas." %}</p>
     {% endfor %}
 </div>
 {% endblock %}
