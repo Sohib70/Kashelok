@@ -103,8 +103,10 @@ msgstr "Отправить код"
 msgid "Login sahifasiga qaytish"
 msgstr "Вернуться к входу"
 
-#: .\templates\accound\login.html:6 .\templates\accound\login.html:17
-#: .\templates\accound\login.html:48 .\templates\accound\logout.html:7
+#: .\templates\accound\login.html:6
+#: .\templates\accound\login.html:17
+#: .\templates\accound\login.html:48
+#: .\templates\accound\logout.html:7
 #: .\templates\accound\signup.html:91
 msgid "Kirish"
 msgstr "Вход"
@@ -117,7 +119,9 @@ msgstr "Логин / Email / Телефон"
 msgid "Login yoki email yoki telefon"
 msgstr "Введите логин, email или телефон"
 
-#: .\templates\accound\login.html:44 .\users\forms.py:11 .\users\forms.py:36
+#: .\templates\accound\login.html:44
+#: .\users\forms.py:11
+#: .\users\forms.py:36
 msgid "Parol"
 msgstr "Пароль"
 
@@ -125,8 +129,10 @@ msgstr "Пароль"
 msgid "Parolni kiriting"
 msgstr "Введите пароль"
 
-#: .\templates\accound\login.html:51 .\templates\accound\signup.html:7
-#: .\templates\accound\signup.html:38 .\templates\accound\signup.html:87
+#: .\templates\accound\login.html:51
+#: .\templates\accound\signup.html:7
+#: .\templates\accound\signup.html:38
+#: .\templates\accound\signup.html:87
 msgid "Ro‘yxatdan o‘tish"
 msgstr "Регистрация"
 
@@ -138,15 +144,17 @@ msgstr "Забыли пароль?"
 msgid "Xush kelibsiz,"
 msgstr "Добро пожаловать,"
 
-#: .\templates\accound\logout.html:5 .\templates\base.html:106
+#: .\templates\accound\logout.html:5
+#: .\templates\base.html:106
 msgid "Chiqish"
 msgstr "Выход"
 
-#: .\templates\accound\profile.html:6 .\templates\accound\profile.html:42
+#: .\templates\accound\profile.html:6
 msgid "Profil sahifasi"
 msgstr "Страница профиля"
 
-#: .\templates\accound\profile.html:46 .\templates\accound\profile.html:48
+#: .\templates\accound\profile.html:46
+#: .\templates\accound\profile.html:48
 #: .\templates\base.html:38
 msgid "Profil rasmi"
 msgstr "Фото профиля"
@@ -167,12 +175,14 @@ msgstr "Вернуться на главную"
 msgid "Emailga kelgan kod"
 msgstr "Код из email"
 
-#: .\templates\accound\reset_password.html:25 .\users\forms.py:45
+#: .\templates\accound\reset_password.html:25
+#: .\users\forms.py:45
 #: .\users\forms.py:63
 msgid "Yangi parol"
 msgstr "Новый пароль"
 
-#: .\templates\accound\reset_password.html:26 .\users\forms.py:64
+#: .\templates\accound\reset_password.html:26
+#: .\users\forms.py:64
 msgid "Yangi parolni tasdiqlash"
 msgstr "Подтвердите новый пароль"
 
@@ -180,3 +190,50 @@ msgstr "Подтвердите новый пароль"
 msgid "Parolni o‘zgartirish"
 msgstr "Изменить пароль"
 
+#: .\templates\base.html:95
+msgid "Amallar"
+msgstr "Действия"
+
+#: .\templates\base.html:96
+msgid "Bosh sahifa"
+msgstr "Главная"
+
+#: .\templates\base.html:97
+msgid "Kirim qo‘shish"
+msgstr "Добавить доход"
+
+#: .\templates\base.html:98
+msgid "Chiqim qo‘shish"
+msgstr "Добавить расход"
+
+#: .\templates\base.html:105
+msgid "Tilni tanlang"
+msgstr "Выберите язык"
+
+#: .\templates\base.html:112
+msgid "Balanslar"
+msgstr "Балансы"
+
+#: .\templates\base.html:113
+msgid "Naqd (SUM)"
+msgstr "Наличные (SUM)"
+
+#: .\templates\base.html:116
+msgid "Karta (SUM)"
+msgstr "Карта (SUM)"
+
+#: .\templates\base.html:119
+msgid "Dollar (USD)"
+msgstr "Доллар (USD)"
+
+#: .\templates\base.html:121
+msgid "Kurs"
+msgstr "Курс"
+
+#: .\templates\base.html:124
+msgid "Umumiy balans"
+msgstr "Общий баланс"
+
+#: .\templates\base.html:137
+msgid "Saqlash"
+msgstr "Сохранить"

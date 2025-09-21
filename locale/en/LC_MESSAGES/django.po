@@ -125,8 +125,10 @@ msgstr "Password"
 msgid "Parolni kiriting"
 msgstr "Enter your password"
 
-#: .\templates\accound\login.html:51 .\templates\accound\signup.html:7
-#: .\templates\accound\signup.html:38 .\templates\accound\signup.html:87
+#: .\templates\accound\login.html:51
+#: .\templates\accound\signup.html:7
+#: .\templates\accound\signup.html:38
+#: .\templates\accound\signup.html:87
 msgid "Ro‘yxatdan o‘tish"
 msgstr "Sign Up"
 
@@ -167,12 +169,14 @@ msgstr "Back to Home"
 msgid "Emailga kelgan kod"
 msgstr "Code from email"
 
-#: .\templates\accound\reset_password.html:25 .\users\forms.py:45
+#: .\templates\accound\reset_password.html:25
+#: .\users\forms.py:45
 #: .\users\forms.py:63
 msgid "Yangi parol"
 msgstr "New Password"
 
-#: .\templates\accound\reset_password.html:26 .\users\forms.py:64
+#: .\templates\accound\reset_password.html:26
+#: .\users\forms.py:64
 msgid "Yangi parolni tasdiqlash"
 msgstr "Confirm New Password"
 
@@ -180,3 +184,24 @@ msgstr "Confirm New Password"
 msgid "Parolni o‘zgartirish"
 msgstr "Change Password"
 
+#: .\finance\templates\category_list.html
+msgid "Kategoriyalar"
+msgstr "Categories"
+
+msgid "Yangi kategoriya"
+msgstr "New Category"
+
+msgid "Kategoriya nomi"
+msgstr "Category Name"
+
+msgid "Jami summasi"
+msgstr "Total Amount"
+
+msgid "Amallar"
+msgstr "Actions"
+
+msgid "Tahrirlash"
+msgstr "Edit"
+
+msgid "O‘chirish"
+msgstr "Delete"

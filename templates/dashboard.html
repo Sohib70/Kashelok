@@ -2,6 +2,7 @@
 {% load humanize %}
 {% load i18n %}
 {% block content %}
+
 <h2>{% trans "Dashboard" %}</h2>
 
 <!-- Period va oraliq sana -->
@@ -58,7 +59,7 @@
         <div class="col-md-3 col-sm-6 mb-3">
             <div class="card p-2 text-center shadow-sm small-card">
                 {% if cat.icon %}
-                <img src="{{ cat.icon.url }}" width="160" class="mb-1"><br>
+                    <img src="{{ cat.icon.url }}" width="160" class="mb-1"><br>
                 {% endif %}
                 <strong>{{ cat.name }}</strong>
                 <p class="text-success mb-0">{{ cat.sum|intcomma }}</p>
@@ -74,7 +75,7 @@
         <div class="col-md-3 col-sm-6 mb-3">
             <div class="card p-2 text-center shadow-sm small-card">
                 {% if cat.icon %}
-                <img src="{{ cat.icon.url }}" width="160" class="mb-1"><br>
+                    <img src="{{ cat.icon.url }}" width="160" class="mb-1"><br>
                 {% endif %}
                 <strong>{{ cat.name }}</strong>
                 <p class="text-danger mb-0">{{ cat.sum|intcomma }}</p>
